@@ -8,10 +8,11 @@ import os
 import re
 import logging
 from typing import List
-from request_collection import Record
 from pathlib import Path
 
 import yaml
+
+from src.request_collection import Record
 
 logger = logging.getLogger(__name__)
 

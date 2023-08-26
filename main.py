@@ -13,8 +13,8 @@ from dotenv import load_dotenv
 
 import yaml
 
-from request_collection import get_collection_records
-from store_collection import collection_to_markdown
+from src.request_collection import get_collection_records
+from src.store_collection import collection_to_markdown
 
 
 logger = logging.getLogger(__name__)
