@@ -53,32 +53,43 @@ def get_collection_records(user_name: str, user_agent: str, pat_token: str | Non
         'User-Agent': user_agent,
     }
 
-    # A collection can be requested without authentication, but the response
-    # will not include image URIs.
+    # A collection can be requested without authentication
+    # but the response will not include image URIs.
     if pat_token:
         headers["Authorization"] = f"Discogs token={pat_token}"
 
-    # TODO up page automatically
-    params = {
-        "page": 1,
-        "per_page": 100,
-        "sort": "artist",
-        "sort_order": "asc"
-    }
+    # Bookkeeping
+    records: List[Record] = []
+    n_pages = 1  # Will be updated dynamically
+    current_page = 1
 
-    response = requests.get(url, headers=headers, params=params)
+    while current_page <= n_pages:
 
-    if response.status_code == 200:
-        data = response.json()
-        logger.info("Request succeeded.")
-    else:
-        logger.error("Request failed with status code %s", response.status_code)
-        sys.exit()
+        # GET request parameters
+        params = {
+            "page": current_page,
+            "per_page": 100,
+            "sort": "artist",
+            "sort_order": "asc"
+        }
 
-    # TODO while page != n_pages, submit GET for following page
-    releases = data['releases']
-    records = [Record(**release['basic_information']) for release in releases]
+        response = requests.get(url, headers=headers, params=params)
 
+        if response.status_code == 200:
+            data = response.json()
+            n_pages = data['pagination']['pages']
+            logger.info("Request succeeded. Retrieved page %s of %s.", current_page, n_pages)
+        else:
+            logger.error("Request failed with status code %s", response.status_code)
+            sys.exit()
+
+        releases = data['releases']
+        records = records + [Record(**release['basic_information']) for release in releases]
+
+        # Update request parameters with the next page
+        current_page = current_page + 1
+
+    logger.info("Retrieved %s records", data['pagination']['items'])
     return records
 
 
