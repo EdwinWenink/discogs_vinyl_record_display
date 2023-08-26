@@ -1,24 +1,17 @@
 """
 Query the Discogs API for a user's collection
-
 N.B. without authentication cover_image is empty.
 """
-import os
+
+import sys
 import requests
 import json
+import logging
 from dataclasses import dataclass
+# from pydantic.dataclasses import dataclass
 from typing import List
 
-from dotenv import load_dotenv
-# from pydantic.dataclasses import dataclass
-
-load_dotenv()
-
-# Specify unique identifier for your application in .env file
-# N.B. we authorize as our own user with a Personal Access Token (PAT)
-# So we do not need the whole OAuth flow.
-USER_AGENT = os.getenv("USER_AGENT")
-PAT_TOKEN = os.getenv("PAT_TOKEN")
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -39,7 +32,7 @@ class Record():
     # notes: list
 
 
-def get_collection_records(username: str = "EJWenink") -> List[Record]:
+def get_collection_records(user_name: str, user_agent: str, pat_token: str | None) -> List[Record]:
     '''
     Get collection of records. The term 'collection' in the discogs API refers to metadata only.
     With 'collection' I refer to the *releases* in a collection i.e. the actual records.
@@ -50,13 +43,20 @@ def get_collection_records(username: str = "EJWenink") -> List[Record]:
     Returns:
         a list of records.
     '''
+    logger.info("Retrieving collection of Discogs user %s", user_name)
+
     base_url = "https://api.discogs.com"
-    url = f"{base_url}/users/{username}/collection/folders/0/releases"
+    url = f"{base_url}/users/{user_name}/collection/folders/0/releases"
+    logger.info("Endpoint: %s", url)
 
     headers: dict = {
-        'User-Agent': USER_AGENT,
-        "Authorization": f"Discogs token={PAT_TOKEN}"
+        'User-Agent': user_agent,
     }
+
+    # A collection can be requested without authentication, but the response
+    # will not include image URIs.
+    if pat_token:
+        headers["Authorization"] = f"Discogs token={pat_token}"
 
     # TODO up page automatically
     params = {
@@ -70,9 +70,10 @@ def get_collection_records(username: str = "EJWenink") -> List[Record]:
 
     if response.status_code == 200:
         data = response.json()
-        print("Data:", data)
+        logger.info("Request succeeded.")
     else:
-        print("Request failed with status code:", response.status_code)
+        logger.error("Request failed with status code %s", response.status_code)
+        sys.exit()
 
     # TODO while page != n_pages, submit GET for following page
     releases = data['releases']

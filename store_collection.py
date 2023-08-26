@@ -6,11 +6,14 @@ own Markdown file with the data as a YAML header
 
 import os
 import re
+import logging
 from typing import List
 from request_collection import Record
 from pathlib import Path
 
 import yaml
+
+logger = logging.getLogger(__name__)
 
 
 def extract_info(record: Record) -> dict:
@@ -59,9 +62,15 @@ def slugify(input: str):
     return val
 
 
-def collection_to_markdown(collection: List[Record], out_folder = 'collection'):
+def collection_to_markdown(collection: List[Record], out_folder='collection'):
+    '''
+    Write the record collection to a folder where each record gets its
+    own Markdown file. Record information is written out as a YAML header.
+    '''
     collection_folder = Path(out_folder)
     os.makedirs(collection_folder, exist_ok=True)
+    logger.info("Storing collection records under '%s'", out_folder)
+
     for record in collection:
         info = extract_info(record)
         extension = '.md'
@@ -70,4 +79,4 @@ def collection_to_markdown(collection: List[Record], out_folder = 'collection'):
         yaml_header = '---\n' + yaml_metadata + '---\n'
         with open(collection_folder / filename, mode='w', encoding='utf-8') as fhandle:
             fhandle.write(yaml_header)
-
+    logger.info("Done writing records.")
