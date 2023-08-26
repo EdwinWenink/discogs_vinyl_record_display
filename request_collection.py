@@ -1,3 +1,8 @@
+"""
+Query the Discogs API for a user's collection
+
+N.B. without authentication cover_image is empty.
+"""
 import os
 import requests
 import json
@@ -9,9 +14,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Unique identifier for your application
-# Specify in .env file
+# Specify unique identifier for your application in .env file
+# N.B. we authorize as our own user with a Personal Access Token (PAT)
+# So we do not need the whole OAuth flow.
 USER_AGENT = os.getenv("USER_AGENT")
+PAT_TOKEN = os.getenv("PAT_TOKEN")
 
 
 @dataclass
@@ -47,9 +54,11 @@ def get_collection_records(username: str = "EJWenink") -> List[Record]:
     url = f"{base_url}/users/{username}/collection/folders/0/releases"
 
     headers: dict = {
-        'User-Agent': USER_AGENT
+        'User-Agent': USER_AGENT,
+        "Authorization": f"Discogs token={PAT_TOKEN}"
     }
 
+    # TODO up page automatically
     params = {
         "page": 1,
         "per_page": 100,
@@ -72,16 +81,11 @@ def get_collection_records(username: str = "EJWenink") -> List[Record]:
     return records
 
 
-def get_all_artists(records: List[Record]):
-    return set([artist['name'] for record in records
-                for artist in record.artists])
-
-
 def get_example_response_json():
+    '''
+    This convenience function loads an example response
+    showing
+    '''
     with open('example_response.json', mode='r') as fhandle:
         response = json.load(fhandle)
     return response
-
-
-# N.B. without authentication cover_image is empty.
-# For example, see https://github.com/jesseward/discogs-oauth-example
