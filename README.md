@@ -25,7 +25,9 @@ The `USER_AGENT` is a required parameter though.
 
 ## Install requirements
 
-TODO
+`pip install -r requirements.txt`
+
+I've used the `|` operator in type hints, so use Python > 3.10.
 
 ## Interactive usage
 
