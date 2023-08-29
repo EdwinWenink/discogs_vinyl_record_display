@@ -6,6 +6,8 @@ The record's data is stored in a YAML header.
 
 I wanted to do this so that I can create a digital record display on my website, which uses Markdown for its content.
 
+As a demo you can see [my vinyl record display](https://www.edwinwenink.xyz/records/).
+
 
 ## Set environment variables
 
@@ -37,3 +39,10 @@ By default the results are written to a folder called `collection`.
 You can override this default.
 
 See `python main.py --help` for the options.
+
+## Tips for deployment
+
+Discords will apply throttling if you make many requests in a short time, which will prevent all records from displaying if you load them all from a single page like I do.
+To avoid this, allow caching of results via a content delivery system (CDS).
+In my case, I modified all calls to `https://i.discogs.com` (which you will find in the markdown files) to `/discogs` on my own domain, and set up a proxy so that `/discogs/*` redirects to `https://i.discogs.com`.
+This allows my hosting provider to cache the responses.

@@ -37,9 +37,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--user_name', type=str,
                         help="Discogs user name.")
-    parser.add_argument('--output_folder', type=str, nargs='?',
-                        const='collection', default='collection',
-                        help="Name of output folder for the collection records. Default is 'collection'.")
+    parser.add_argument(
+        '--output_folder', type=str, nargs='?',
+        const='collection', default='collection',
+        help="Name of output folder for the collection records. Default is 'collection'.")
     args = parser.parse_args()
 
     records = get_collection_records(args.user_name, USER_AGENT, PAT_TOKEN)
