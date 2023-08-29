@@ -44,7 +44,7 @@ See `python main.py --help` for the options.
 
 ## Tips for deployment
 
-Discords will apply throttling if you make many requests in a short time, which will prevent all records from displaying if you load them all from a single page like I do.
-To avoid this, allow caching of results via a content delivery system (CDS).
-In my case, I modified all calls to `https://i.discogs.com` (which you will find in the markdown files) to `/discogs` on my own domain, and set up a proxy so that `/discogs/*` redirects to `https://i.discogs.com`.
+Discogs will throttle if you make many requests in a short time, which will prevent some records from displaying if you load them all from a single page like I do.
+To avoid this, allow caching of request results via a content delivery system (CDS).
+In my case, I modified all calls to `https://i.discogs.com` (which you will find in the output markdown files) to `/discogs` on my own domain, and set up a proxy so that `/discogs/*` redirects to `https://i.discogs.com`.
 This allows my hosting provider to cache the responses.
