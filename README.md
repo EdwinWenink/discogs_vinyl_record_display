@@ -8,6 +8,7 @@ I wanted to do this so that I can create a digital record display on my website,
 
 As a demo you can see [my vinyl record display](https://www.edwinwenink.xyz/records/).
 
+If you use this project to showcase records on your website, let me know so I can include a link to your website here :-) ! 
 
 ## Set environment variables
 
